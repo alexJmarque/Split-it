@@ -1,0 +1,7 @@
+{
+  "name": "split-it-api",
+  "private": true,
+  "engines": {
+    "node": "20.x"
+  }
+}
