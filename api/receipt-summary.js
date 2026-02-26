@@ -2,19 +2,13 @@ export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
   try {
-    const appSecret = process.env.APP_API_SECRET;
-    if (appSecret) {
-      const got = req.headers["x-app-secret"];
-      if (got !== appSecret) return res.status(401).json({ error: "Unauthorized" });
-    }
-
     const { text } = req.body ?? {};
     if (!text || typeof text !== "string") return res.status(400).json({ error: "Missing text" });
 
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) return res.status(500).json({ error: "Server missing OPENAI_API_KEY" });
 
-    // EXACT same content as your Swift file (system + user instructions)
+    // EXACT prompt format your Swift code expects
     const prompt =
 `You are a helpful assistant that analyzes receipt information.
 
@@ -48,22 +42,22 @@ ${text}`;
       method: "POST",
       headers: {
         Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         model: "gpt-4.1-mini",
         input: prompt,
         temperature: 0.1,
         max_output_tokens: 1000,
-        text: { format: { type: "text" } }
-      })
+        text: { format: { type: "text" } }, // helps avoid empty output_text
+      }),
     });
 
     const data = await r.json();
     if (!r.ok) return res.status(r.status).json({ error: data });
 
+    // robust extraction
     let resultText = (data.output_text ?? "").trim();
-
     if (!resultText && Array.isArray(data.output)) {
       let combined = "";
       for (const item of data.output) {
