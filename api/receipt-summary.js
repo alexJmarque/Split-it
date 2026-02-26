@@ -18,7 +18,7 @@ Analyze the following receipt text and extract the following information:
 - Tax amount; if it's shown in percentage, do the math to find the amount.
 - Name of the place
 
-Format the output without any spaces between categories, as follows:
+Format the output EXACTLY as follows:
 ITEMS:
 item_name//quantity//price
 item_name//quantity//price
@@ -34,6 +34,10 @@ Important notes:
 3. Double-check that the item prices and quantities make sense (OCR text can be inaccurate/unstructured).
 4. At the end, double-check your answer: sum(price*quantity) should match the total amount.
 5. When there is a reduction, directly apply the reduction on the correct item.
+- Each category must start on a new line.
+- Each item must be on its own line.
+- No extra spaces.
+- No text before ITEMS:
 
 Receipt text:
 ${text}`;
